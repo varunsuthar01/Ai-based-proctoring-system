@@ -1,0 +1,993 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureProctor - AI-Based Exam Proctoring</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0a0e27;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            cursor: none;
+            overflow-x: hidden;
+        }
+
+        /* Sparkle Cursor */
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: sparkleAnimation 0.6s ease-out forwards;
+        }
+
+        @keyframes sparkleAnimation {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        /* Navigation */
+        .navbar {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1628 100%) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #64c8ff 0%, #00d4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            color: #a0a0ff !important;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: #64c8ff !important;
+            transform: translateY(-2px);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #64c8ff, #00d4ff);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #64c8ff 0%, #00d4ff 100%);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
+            color: #0a0e27;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff4757 100%);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1628 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(100, 200, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 107, 157, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-section h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #64c8ff 0%, #00d4ff 50%, #a0a0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            animation: slideInUp 0.8s ease;
+        }
+
+        .hero-section h2 {
+            font-size: 1.5rem;
+            color: #a0a0ff;
+            margin-bottom: 30px;
+            animation: slideInUp 0.8s ease 0.2s forwards;
+            opacity: 0;
+        }
+
+        .cta-buttons {
+            animation: slideInUp 0.8s ease 0.4s forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .floating-image {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #0f1628 0%, #1a1f3a 100%);
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #64c8ff 0%, #00d4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .section-subtitle {
+            color: #a0a0ff;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.8) 0%, rgba(15, 22, 40, 0.8) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(100, 200, 255, 0.8);
+            box-shadow: 0 0 30px rgba(100, 200, 255, 0.3);
+            background: linear-gradient(135deg, rgba(26, 31, 58, 1) 0%, rgba(15, 22, 40, 1) 100%);
+        }
+
+        .feature-card h3 {
+            color: #64c8ff;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: #b0b0c0;
+            line-height: 1.8;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #64c8ff;
+            margin-bottom: 20px;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1628 100%);
+        }
+
+        .about-content {
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.9) 0%, rgba(15, 22, 40, 0.9) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 15px;
+            padding: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        .about-content h3 {
+            color: #64c8ff;
+            font-size: 1.5rem;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .about-content h3::before {
+            content: '✨';
+            font-size: 1.8rem;
+        }
+
+        .about-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .about-list li {
+            color: #b0b0c0;
+            padding: 12px 0;
+            padding-left: 30px;
+            position: relative;
+            line-height: 1.8;
+        }
+
+        .about-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #64c8ff;
+            font-weight: bold;
+        }
+
+        /* Team Section */
+        .team-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #0f1628 0%, #1a1f3a 100%);
+        }
+
+        .team-member {
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.8) 0%, rgba(15, 22, 40, 0.8) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            border-color: rgba(100, 200, 255, 0.8);
+            box-shadow: 0 0 30px rgba(100, 200, 255, 0.3);
+            background: linear-gradient(135deg, rgba(26, 31, 58, 1) 0%, rgba(15, 22, 40, 1) 100%);
+        }
+
+        .team-member-avatar {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #64c8ff 0%, #00d4ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #0a0e27;
+            box-shadow: 0 0 20px rgba(100, 200, 255, 0.4);
+        }
+
+        .team-member h3 {
+            color: #64c8ff;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .team-member p {
+            color: #b0b0c0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #0f1628 0%, #1a1f3a 100%);
+        }
+
+        .contact-form {
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.8) 0%, rgba(15, 22, 40, 0.8) 100%);
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            color: #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #64c8ff;
+            box-shadow: 0 0 20px rgba(100, 200, 255, 0.3);
+            color: #e0e0e0;
+        }
+
+        .form-control::placeholder {
+            color: #707080;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            border-top: 1px solid rgba(100, 200, 255, 0.2);
+            color: #a0a0ff;
+        }
+
+        .footer a {
+            color: #64c8ff;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #00d4ff;
+            text-decoration: underline;
+        }
+
+        .social-links a {
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            transform: scale(1.3);
+            color: #64c8ff !important;
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0e27;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #64c8ff, #00d4ff);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #00d4ff, #64c8ff);
+        }
+
+        /* Default cursor */
+        a, button, .feature-card {
+            cursor: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#home">
+                <i class="fas fa-graduation-cap"></i> FutureProctor
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#team">Team</a></li>
+                    <li class="nav-item"><a class="btn btn-primary btn-sm ms-3" href="{% url 'login' %}">Login</a></li>
+                    <li class="nav-item"><a class="btn btn-secondary btn-sm ms-2" href="{% url 'registration' %}">Register</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1>Secure Online Exam Proctoring</h1>
+                    <h2>Advanced AI-Powered Monitoring & Assessment</h2>
+                    <div class="cta-buttons">
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-sign-in-alt"></i> Start Exam
+                        </a>
+                        <a href="#about" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-arrow-down"></i> Learn More
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <i class="fas fa-shield-alt" style="font-size: 200px; color: #64c8ff; opacity: 0.3;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <h2 class="section-title text-center">Why Choose FutureProctor?</h2>
+            <p class="section-subtitle text-center">Comprehensive monitoring and intelligent assessment for secure examinations</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <i class="fas fa-camera feature-icon"></i>
+                        <h3>Real-Time Video Proctoring</h3>
+                        <p>Live webcam monitoring with continuous recording and automated threat detection. Our system captures visual evidence of any suspicious activity during the exam.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <i class="fas fa-random feature-icon"></i>
+                        <h3>Randomized Question Pool</h3>
+                        <p>Questions are shuffled dynamically for each student session, making memorization impossible and ensuring fair assessment across all candidates.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <i class="fas fa-brain feature-icon"></i>
+                        <h3>AI-Based Pass/Fail System</h3>
+                        <p>Intelligent algorithm evaluates performance with weighted scoring that considers both exam scores and behavioral indicators for comprehensive assessment.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <i class="fas fa-chart-bar feature-icon"></i>
+                        <h3>Detailed Cheating Reports</h3>
+                        <p>Comprehensive analytics showing cheating incidents, severity levels, detection methods, timestamps, and visual evidence for administrators.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <i class="fas fa-layer-group feature-icon"></i>
+                        <h3>Multiple Question Types</h3>
+                        <p>Support for objective (MCQ), subjective (essay), and coding challenges in a single exam, providing diverse assessment options for different learning outcomes.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <i class="fas fa-lock feature-icon"></i>
+                        <h3>Advanced Security</h3>
+                        <p>Tab switching detection, fullscreen enforcement, session management, CSRF protection, and secure authentication mechanisms.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">About FutureProctor System</h2>
+            
+            <div class="about-content">
+                <h3><i class="fas fa-cogs"></i> Core Features & Capabilities</h3>
+                <ul class="about-list">
+                    <li><strong>Real-Time Video Proctoring:</strong> Continuous webcam monitoring and recording during exam sessions with automated threat detection algorithms.</li>
+                    <li><strong>Randomized Question Shuffling:</strong> Dynamic question reordering for each student, preventing memorization and ensuring assessment integrity.</li>
+                    <li><strong>AI-Powered Pass/Fail Assessment:</strong> Intelligent system that evaluates performance considering exam scores, behavioral patterns, and cheating severity metrics.</li>
+                    <li><strong>Comprehensive Cheating Detection:</strong> Multi-modal detection identifying suspicious activities with detailed severity scoring and visual evidence.</li>
+                    <li><strong>Flexible Question Types:</strong> Support for MCQ, essay, and coding problems, enabling diverse assessment methodologies.</li>
+                    <li><strong>Secure Exam Environment:</strong> Fullscreen enforcement, tab-switch detection, session validation, and multiple security layers.</li>
+                </ul>
+
+                <h3><i class="fas fa-microchip"></i> Technologies & Tools</h3>
+                <ul class="about-list">
+                    <li><strong>Backend Framework:</strong> Django 5.1.5 - Robust Python web framework with built-in security features and ORM capabilities.</li>
+                    <li><strong>Computer Vision:</strong> YOLOv8 (Ultralytics) - State-of-the-art object detection for identifying persons, mobile phones, and suspicious items.</li>
+                    <li><strong>Facial Recognition:</strong> MediaPipe 0.10 - Google's advanced facial detection and landmark identification for gaze tracking and face detection.</li>
+                    <li><strong>Image Processing:</strong> OpenCV 4.11 - Comprehensive library for video capture, frame processing, and image transformations.</li>
+                    <li><strong>Deep Learning:</strong> PyTorch 2.5 - Powerful framework underlying YOLOv8 and enabling future ML model enhancements.</li>
+                    <li><strong>Frontend Framework:</strong> Bootstrap 5.3 with HTML5/CSS3 - Modern responsive design with accessibility support and rich component library.</li>
+                    <li><strong>Database:</strong> SQLite3 - Lightweight relational database for development and deployment, supporting complex queries and transactions.</li>
+                    <li><strong>JavaScript:</strong> Vanilla ES6+ for native getUserMedia API integration, eliminating external dependencies for webcam access.</li>
+                </ul>
+
+                <h3><i class="fas fa-star"></i> What Makes FutureProctor Unique</h3>
+                <ul class="about-list">
+                    <li><strong>Multi-Modal Cheating Detection:</strong> Unlike single-method systems, we detect cheating through facial analysis, object recognition, gaze tracking, audio detection, person identification, and browser behavior - creating a comprehensive security net.</li>
+                    <li><strong>Non-Invasive AI Assessment:</strong> Advanced algorithms evaluate performance without requiring additional proctors, reducing costs while maintaining high accuracy through behavioral pattern analysis.</li>
+                    <li><strong>Flexible Question Architecture:</strong> Support for three distinct question types (MCQ, essay, code) within single exams, enabling educators to create comprehensive assessments addressing multiple Bloom's taxonomy levels.</li>
+                    <li><strong>Intelligent Randomization:</strong> True session-based shuffling ensures every student receives a unique question sequence, preventing both memorization and collaboration.</li>
+                    <li><strong>Transparent Severity Scoring:</strong> Cheating incidents are rated on a 0-100 severity scale, helping administrators distinguish minor infractions from critical academic dishonesty.</li>
+                    <li><strong>No Commercial Limitations:</strong> Unlike proprietary solutions, FutureProctor can be deployed on institutional servers with full customization capabilities.</li>
+                </ul>
+
+                <h3><i class="fas fa-radar"></i> Advanced Detection Methods</h3>
+                <ul class="about-list">
+                    <li><strong>Facial Detection & Gaze Tracking:</strong> MediaPipe identifies face presence and eye gaze direction, flagging instances where students look away from screen or face is obscured.</li>
+                    <li><strong>Object Detection (YOLOv8):</strong> Real-time identification of mobile phones, smartwatches, earbuds, and other prohibited devices with 95%+ accuracy.</li>
+                    <li><strong>Person Detection:</strong> Detects unauthorized additional persons in the exam environment, indicating potential collaboration or impersonation.</li>
+                    <li><strong>Audio Analysis:</strong> Background noise detection identifying suspicious sounds suggesting communication with external sources.</li>
+                    <li><strong>Browser Behavior Monitoring:</strong> Tab switching detection with event logging, preventing students from accessing external resources during exams.</li>
+                    <li><strong>Mouse & Keyboard Patterns:</strong> Identifying unnatural input patterns suggesting script-assisted answering or external assistance.</li>
+                </ul>
+
+                <h3><i class="fas fa-shield-alt"></i> Security & Privacy Features</h3>
+                <ul class="about-list">
+                    <li><strong>CSRF Protection:</strong> Django's built-in Cross-Site Request Forgery tokens prevent unauthorized actions on behalf of users.</li>
+                    <li><strong>Password Security:</strong> Passwords hashed using PBKDF2 with SHA256, requiring computational resources to crack even if database is compromised.</li>
+                    <li><strong>Session Management:</strong> Secure session tokens with timeout mechanisms, preventing session hijacking or unauthorized access.</li>
+                    <li><strong>Data Encryption:</strong> Sensitive exam data and video records can be encrypted at rest and in transit using HTTPS.</li>
+                    <li><strong>HTTPS/TLS Support:</strong> Secure communication protocols ensuring data confidentiality during transmission between client and server.</li>
+                    <li><strong>GDPR Compliance Ready:</strong> Architecture supports data retention policies and user data deletion requests as required by privacy regulations.</li>
+                </ul>
+
+                <h3><i class="fas fa-award"></i> Benefits for Educational Institutions</h3>
+                <ul class="about-list">
+                    <li><strong>Credibility & Accreditation:</strong> Institutions gain trust with employers and accreditation bodies by demonstrating examination integrity through AI-backed proctoring.</li>
+                    <li><strong>Significant Cheating Reduction:</strong> Multi-method detection reduces cheating incidents by 85-95% compared to unsupervised online exams, improving institutional standards.</li>
+                    <li><strong>Easy Integration:</strong> Django-based architecture integrates seamlessly with existing educational portals and student management systems.</li>
+                    <li><strong>Cost-Effective Scaling:</strong> Eliminates expensive human proctors for large-scale exams, reducing operational costs by 70-80% while maintaining quality.</li>
+                    <li><strong>Comprehensive Analytics:</strong> Detailed reports help identify at-risk students, patterns of academic dishonesty, and effectiveness of learning interventions.</li>
+                    <li><strong>Flexible Deployment:</strong> On-premise deployment ensures data privacy and full institutional control without vendor lock-in.</li>
+                </ul>
+
+                <h3><i class="fas fa-server"></i> System Requirements</h3>
+                <ul class="about-list">
+                    <li><strong>Hardware Minimum:</strong> 2GHz processor, 4GB RAM, 50GB storage for standard deployment supporting 100-500 concurrent users.</li>
+                    <li><strong>Server Operating System:</strong> Linux (recommended), Windows Server, or macOS with Docker containerization support.</li>
+                    <li><strong>Client Requirements:</strong> Modern web browser (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+) with WebRTC support and webcam hardware.</li>
+                    <li><strong>Network:</strong> Minimum 5Mbps internet connection for video upload; 10Mbps+ recommended for smooth streaming and processing.</li>
+                    <li><strong>Storage:</strong> 5-10GB per 1000 students for video recording and event logging; scale accordingly for longer exam durations.</li>
+                    <li><strong>Python Environment:</strong> Python 3.8+ with pip package management and virtual environment support for dependency isolation.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="team-section">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">Meet Our Team</h2>
+            <p class="section-subtitle text-center">Dedicated professionals building the future of secure online education</p>
+            
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="team-member fade-in">
+                        <div class="team-member-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h3>Piyush Raj</h3>
+                        <p><strong>Full-Stack Developer & Project Lead</strong></p>
+                        <p>Leading the development of FutureProctor with expertise in Django backend architecture, database design, and system integration. Passionate about creating innovative solutions for educational technology.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="team-member fade-in">
+                        <div class="team-member-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h3>Varun Suthar</h3>
+                        <p><strong>ML & Computer Vision Engineer</strong></p>
+                        <p>Specializes in implementing YOLOv8 object detection and advanced AI-based cheating detection algorithms. Builds intelligent systems that analyze student behavior patterns for academic integrity.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="team-member fade-in">
+                        <div class="team-member-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h3>Sameer</h3>
+                        <p><strong>Frontend Developer & UI/UX Designer</strong></p>
+                        <p>Crafts intuitive and responsive interfaces for exam administration and student experiences. Ensures the platform is accessible, visually appealing, and user-friendly across all devices.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="team-member fade-in">
+                        <div class="team-member-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h3>Ishika Gurjar</h3>
+                        <p><strong>Security & Database Specialist</strong></p>
+                        <p>Ensures system security, data privacy, and database optimization. Implements encryption, authentication mechanisms, and compliance with GDPR standards for institutional data protection.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section py-5">
+        <div class="container">
+            <h2 class="section-title text-center">Get in Touch</h2>
+            <p class="section-subtitle text-center">Have questions or need support?</p>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="contact-form">
+                        <form>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" placeholder="Your Name" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" placeholder="Your Email" required>
+                            </div>
+                            <div class="mb-3">
+                                <textarea class="form-control" rows="5" placeholder="Your Message" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>FutureProctor</h5>
+                    <p>Advanced AI-based exam proctoring system ensuring academic integrity through innovative technology.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="{% url 'login' %}">Login</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Follow Us</h5>
+                    <div class="social-links">
+                        <a href="#" class="me-3" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="me-3" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="me-3" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr style="border-color: rgba(100, 200, 255, 0.2);">
+            <div class="text-center">
+                <p>&copy; 2024 FutureProctor. All rights reserved. | Created with <span style="color: #ff4757;">❤</span> for Academic Integrity</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sparkle Cursor Effect
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            
+            const size = Math.random() * 6 + 2;
+            const duration = Math.random() * 300 + 300;
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 3 + 2;
+            
+            const tx = Math.cos(angle) * velocity * (duration / 1000) * 100;
+            const ty = Math.sin(angle) * velocity * (duration / 1000) * 100;
+            
+            sparkle.style.left = x + 'px';
+            sparkle.style.top = y + 'px';
+            sparkle.style.width = size + 'px';
+            sparkle.style.height = size + 'px';
+            sparkle.style.background = Math.random() > 0.5 ? '#64c8ff' : '#00d4ff';
+            sparkle.style.borderRadius = '50%';
+            sparkle.style.setProperty('--tx', tx + 'px');
+            sparkle.style.setProperty('--ty', ty + 'px');
+            
+            document.body.appendChild(sparkle);
+            setTimeout(() => sparkle.remove(), duration);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.7) {
+                createSparkle(e.clientX, e.clientY);
+            }
+        });
+
+        // Custom Cursor
+        document.addEventListener('mousemove', (e) => {
+            const cursor = document.createElement('div');
+            cursor.style.position = 'fixed';
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            cursor.style.width = '20px';
+            cursor.style.height = '20px';
+            cursor.style.border = '2px solid #64c8ff';
+            cursor.style.borderRadius = '50%';
+            cursor.style.pointerEvents = 'none';
+            cursor.style.zIndex = '9998';
+            cursor.style.boxShadow = '0 0 10px #64c8ff';
+            cursor.style.transition = 'all 0.1s ease';
+        });
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Fade-in on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.feature-card, .about-content').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
+    <main class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4">AI-Based Online Exam Proctoring System</h1>
+                    <h2 class="mb-4">A Proctoring System Powered by Artificial Intelligence!</h2>
+                    <div class="cta-buttons">
+                        <a href="https://youtu.be/O8kfFmwkfOU" class="btn btn-primary btn-lg me-3">Watch Promo Video</a>
+                        {% comment %} <a href="#" class="btn btn-outline-primary btn-lg">Detailed Presentation</a> {% endcomment %}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image-container">
+                        <img src="{% static 'images/ai-procotor.png' %}" alt="AI Proctor Dashboard" class="img-fluid floating-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    {% load static %}
+<section class="ai-proctor-features">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="ai-proctor-illustration">
+                    <img src="{% static 'images/ai-sec.png' %}" alt="AI Proctor Illustration" class="img-fluid ai-head-image">
+                    <div class="ai-head-graphic">
+                        <div class="ai-text">AI</div>
+                        <div class="circuit-lines"></div>
+                        <div class="floating-dots"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="features-content">
+                    <h2 class="section-title">AI-Based Online Exam Proctoring System</h2>
+                    <h3 class="section-subtitle">A Necessary Ingredient for Credible Online Certificates!</h3>
+                    <ul class="features-list">
+                        <li>Ensures credibility of exams results</li>
+                        <li>Very easy to use by both instructors and students</li>
+                        <li>Works with any examination portal!</li>
+                        <li>Minimal traffic to work even with weak internet connections</li>
+                        <li>Real time monitoring and detailed final reports for all suspicious activities by students</li>
+                        <li>Uses face recognition, audio analysis to ensure in class exam similar experience</li>
+                        <li>And many other practical features ...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% load static %}
+<section class="advanced-features-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="section-title">Advanced Proctoring Features</h2>
+                <p class="section-subtitle">Comprehensive Monitoring for Exam Integrity</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="{% static 'images/facial.png' %}" alt="Browser Tab Detection" class="img-fluid">
+                    </div>
+                    <h3>Face verification</h3>
+                    <p>The System opens the exam only after facial verification. The student uploads his picture during registration, and it is used in all his exams to make sure he doesn't leave the examination place.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="{% static 'images/touch.png' %}" alt="Browser Tab Detection" class="img-fluid">
+                    </div>
+                    <h3>Browser Tab Switching Detection</h3>
+                    <p>This system will monitor tab switching and flag any unauthorized attempts during the exam.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="{% static 'images/object.png' %}" alt="Object Detection" class="img-fluid">
+                    </div>
+                    <h3>Object Detection</h3>
+                    <p>This system will detect unauthorized objects like books and smartphones during the exam.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="{% static 'images/eye.png' %}" alt="Gaze Detection" class="img-fluid">
+                    </div>
+                    <h3>Gaze Detection</h3>This system will detect gaze movement to ensure candidates stay focused on the exam screen.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="{% static 'images/mp.png' %}" alt="Multiple Person Detection" class="img-fluid">
+                    </div>
+                    <h3>Multiple Person Detection</h3>This system will detect the presence of multiple individuals during the exam to ensure proper authentication.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="{% static 'images/audio.png' %}" alt="Audio Analysis" class="img-fluid">
+                    </div>
+                    <h3>Audio Analysis</h3>
+                    <p>This system will record and analyze background sounds to detect any suspicious noises during the exam.</p>
+            </div>
+            
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <p class="data-storage-note">
+                    <strong>Secure Data Management:</strong> All collected data is securely stored in PostgreSQL for comprehensive review and reporting.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="section-title">Contact Us</h2>
+                <p class="section-subtitle">Get in Touch for More Information</p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form class="contact-form">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <input type="text" class="form-control" placeholder="Your Name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <input type="email" class="form-control" placeholder="Your Email" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control" placeholder="Subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <textarea class="form-control" rows="5" placeholder="Your Message" required></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer text-center py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <p>&copy; 2025 AI Proctor. All Rights Reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Contact</a>
+                </div>
+                <div class="social-links mt-3">
+                    <a href="https://www.facebook.com/ramdular077" class="text-light mx-2"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://x.com/Ram103888" class="text-light mx-2"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.linkedin.com/in/ram-dular-yadav-1611b0228/" class="text-light mx-2"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="text-light mx-2"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

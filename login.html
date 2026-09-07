@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FutureProctor - Student Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1628 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            cursor: none;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(100, 200, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 107, 157, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Sparkle Cursor */
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: sparkleAnimation 0.6s ease-out forwards;
+        }
+
+        @keyframes sparkleAnimation {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.95) 0%, rgba(15, 22, 40, 0.95) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(100, 200, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            width: 90vw;
+            height: 90vh;
+            max-width: 1200px;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1628 100%);
+            border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-title {
+            text-align: center;
+            width: 100%;
+            background: linear-gradient(135deg, #64c8ff 0%, #00d4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .modal-body {
+            padding: 30px;
+            height: calc(90vh - 150px);
+            overflow-y: auto;
+        }
+
+        .form-label {
+            color: #64c8ff;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            color: #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            padding: 12px 15px;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #64c8ff;
+            box-shadow: 0 0 20px rgba(100, 200, 255, 0.3);
+            color: #e0e0e0;
+        }
+
+        .form-control::placeholder {
+            color: #707080;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(100, 200, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            color: #b0d4ff;
+            border-radius: 10px;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1) 0%, rgba(255, 107, 157, 0.05) 100%);
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            color: #ff9db5;
+            border-radius: 10px;
+        }
+
+        .instructions h4 {
+            color: #64c8ff;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+            color: #b0d4ff;
+            line-height: 1.8;
+        }
+
+        #webcam-stream {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            background-color: #000;
+            border: 2px solid rgba(100, 200, 255, 0.3);
+            box-shadow: 0 0 20px rgba(100, 200, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        #webcam-stream:hover {
+            border-color: rgba(100, 200, 255, 0.6);
+            box-shadow: 0 0 30px rgba(100, 200, 255, 0.4);
+        }
+
+        .card {
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.8) 0%, rgba(15, 22, 40, 0.8) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 15px;
+            margin-top: 15px;
+        }
+
+        .card-title {
+            color: #64c8ff;
+            font-weight: 700;
+        }
+
+        .captured-photo img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(100, 200, 255, 0.3);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #64c8ff 0%, #00d4ff 100%);
+            border: none;
+            color: #0a0e27;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(100, 200, 255, 0.5);
+            color: #0a0e27;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #64c8ff 0%, #00d4ff 100%);
+            border: none;
+            color: #0a0e27;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(100, 200, 255, 0.5);
+            color: #0a0e27;
+        }
+
+        .btn-secondary {
+            background: rgba(100, 200, 255, 0.1);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            color: #64c8ff;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(100, 200, 255, 0.2);
+            border-color: #64c8ff;
+            color: #00d4ff;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(100, 200, 255, 0.2);
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.5) 0%, rgba(15, 22, 40, 0.5) 100%);
+            padding: 20px;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .modal-dialog {
+            margin: 0;
+            max-width: 100%;
+            height: 100vh;
+        }
+
+        #loginModal {
+            display: block;
+            width: 100%;
+            height: 100vh;
+        }
+
+        h5 {
+            color: #64c8ff;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .position-relative {
+            position: relative;
+        }
+
+        a {
+            color: #64c8ff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: none;
+        }
+
+        a:hover {
+            color: #00d4ff;
+            text-decoration: underline;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0e27;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #64c8ff, #00d4ff);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #00d4ff, #64c8ff);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .register-link a {
+            transition: all 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: #00d4ff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel"><i class="fas fa-sign-in-alt"></i> Student Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="container-fluid">
+                    <!-- Instructions Section -->
+                    <div class="alert alert-warning instructions" role="alert">
+                        <h4 class="alert-heading"><i class="fas fa-info-circle"></i> Login Instructions:</h4>
+                        <ul>
+                            <li>Click <strong>Capture Photo</strong> to take a snapshot using your webcam.</li>
+                            <li>Enter your email and password in the login form.</li>
+                            <li>Click <strong>Login</strong> to authenticate and start your exam.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- Login Form Section -->
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-user-circle"></i> Login Credentials</h5>
+                                <form id="login-form" method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div id="error-message" class="alert alert-danger d-none"></div>
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label"><i class="fas fa-envelope"></i> Email:</label>
+                                        <input type="email" id="username" name="email" class="form-control" placeholder="Enter your email" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label"><i class="fas fa-lock"></i> Password:</label>
+                                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+                                    </div>
+                                    <input type="hidden" id="captured_photo_input" name="captured_photo">
+                                </form>
+                                <div class="register-link">
+                                    <p>Don't have an account? <a href="{% url 'registration' %}"><strong>Register here</strong></a></p>
+                                </div>
+                            </div>
+
+                            <!-- Face Recognition Section -->
+                            <div class="col-md-6 text-center">
+                                <h5><i class="fas fa-camera"></i> Face Recognition</h5>
+                                <div class="position-relative">
+                                    <video id="webcam-stream" style="width: 100%; max-width: 100%; height: auto; aspect-ratio: 4/3;" autoplay playsinline></video>
+                                    <canvas id="canvas" class="d-none"></canvas>
+                                </div>
+                                <button type="button" id="take-photo-btn" class="btn btn-info mt-3" style="width: 100%;">
+                                    <i class="fas fa-camera"></i> Capture Photo
+                                </button>
+
+                                <!-- Captured Photo Section -->
+                                <div class="captured-photo card d-none">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-check-circle"></i> Captured Photo</h5>
+                                        <img id="captured-photo" alt="Captured Photo" class="img-thumbnail">
+                                        <p style="color: #64c8ff; font-size: 0.85rem; margin-top: 10px;"><i class="fas fa-check"></i> Photo captured successfully</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer with Buttons aligned in a row -->
+                    <div class="modal-footer button-row">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i> Close
+                        </button>
+                        <button type="button" class="btn btn-primary" id="login-btn">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sparkle Cursor Effect
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            
+            const size = Math.random() * 6 + 2;
+            const duration = Math.random() * 300 + 300;
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 3 + 2;
+            
+            const tx = Math.cos(angle) * velocity * (duration / 1000) * 100;
+            const ty = Math.sin(angle) * velocity * (duration / 1000) * 100;
+            
+            sparkle.style.left = x + 'px';
+            sparkle.style.top = y + 'px';
+            sparkle.style.width = size + 'px';
+            sparkle.style.height = size + 'px';
+            sparkle.style.background = Math.random() > 0.5 ? '#64c8ff' : '#00d4ff';
+            sparkle.style.borderRadius = '50%';
+            sparkle.style.setProperty('--tx', tx + 'px');
+            sparkle.style.setProperty('--ty', ty + 'px');
+            
+            document.body.appendChild(sparkle);
+            setTimeout(() => sparkle.remove(), duration);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.7) {
+                createSparkle(e.clientX, e.clientY);
+            }
+        });
+
+        const videoElement = document.getElementById('webcam-stream');
+        const takePhotoBtn = document.getElementById('take-photo-btn');
+        const canvas = document.getElementById('canvas');
+        const capturedPhoto = document.getElementById('captured-photo');
+        const capturedPhotoInput = document.getElementById('captured_photo_input');
+        const errorMessage = document.getElementById('error-message');
+        const loginBtn = document.getElementById('login-btn');
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        let photoCaptured = false;
+        let stream = null;
+
+        // Initialize camera on page load
+        async function initCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 300, height: 280, facingMode: 'user' }
+                });
+                videoElement.srcObject = stream;
+            } catch (error) {
+                errorMessage.textContent = '<i class="fas fa-exclamation-triangle"></i> Camera access denied or not available: ' + error.message;
+                errorMessage.classList.remove('d-none');
+                console.error('Camera error:', error);
+            }
+        }
+
+        takePhotoBtn.addEventListener('click', () => {
+            if (!videoElement.srcObject) {
+                errorMessage.textContent = '<i class="fas fa-exclamation-triangle"></i> Camera is not initialized';
+                errorMessage.classList.remove('d-none');
+                return;
+            }
+
+            canvas.width = videoElement.videoWidth || 300;
+            canvas.height = videoElement.videoHeight || 280;
+
+            const context = canvas.getContext('2d');
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+            const photoData = canvas.toDataURL('image/jpeg', 0.9);
+            capturedPhoto.src = photoData;
+            capturedPhotoInput.value = photoData;
+            photoCaptured = true;
+            document.querySelector('.captured-photo').classList.remove('d-none');
+            errorMessage.classList.add('d-none');
+        });
+
+        loginBtn.addEventListener('click', (event) => {
+            if (!photoCaptured) {
+                event.preventDefault();
+                errorMessage.textContent = "<i class='fas fa-exclamation-triangle'></i> Please capture your photo before logging in.";
+                errorMessage.classList.remove('d-none');
+            } else {
+                const formData = new FormData();
+                formData.append('email', document.getElementById('username').value);
+                formData.append('password', document.getElementById('password').value);
+                formData.append('captured_photo', capturedPhotoInput.value);
+
+                fetch('/login/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Welcome, " + data.student_name);
+                        window.location.href = data.redirect_url;
+                    } else {
+                        errorMessage.innerHTML = "<i class='fas fa-exclamation-circle'></i> " + data.error;
+                        errorMessage.classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Login error:', error);
+                    errorMessage.innerHTML = "<i class='fas fa-exclamation-circle'></i> An error occurred during login.";
+                    errorMessage.classList.remove('d-none');
+                });
+            }
+        });
+
+        // Initialize camera when page loads
+        window.addEventListener('load', initCamera);
+
+        // Stop camera when page unloads
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+</body>
+</html>

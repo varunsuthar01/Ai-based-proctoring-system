@@ -1,238 +1,95 @@
-# 🛡️ AI-Based Proctoring System
+# AI-Based Online Exam Proctoring System
 
-An AI-powered online examination proctoring system designed to monitor candidates during exams, detect suspicious activities, and improve the security and integrity of online assessments.
+## Overview
 
-## 📌 Overview
+The **AI-Based Online Exam Proctoring System** is a cutting-edge proctoring solution that ensures the integrity of online examinations. It employs advanced artificial intelligence techniques, including face detection, object detection, gaze tracking, real-time browser activity monitoring, and audio analysis, to monitor and prevent fraudulent activities during exams. This system helps maintain fairness and credibility in remote examinations by providing automated invigilation and detailed reports.
 
-The **AI-Based Proctoring System** uses computer vision and real-time monitoring to automatically supervise online examinations.
+## Features
+- **Face Detection**: Identifies and verifies the student's face to ensure the registered candidate is taking the exam.
+- **Object Detection**: Detects unauthorized objects such as smartphones, books, or other cheating materials.
+- **Gaze Detection**: Monitors the candidate's eye movements to detect suspicious behavior, such as looking away from the screen frequently.
+- **Real-Time Browser Activity Monitoring**: Tracks tab switches and alerts when the candidate navigates away from the exam interface.
+- **Audio Analysis**: Captures and analyzes external sounds through an external microphone to detect conversations or background noises.
+- **Comprehensive Reports**: Generates detailed reports on suspicious activities and rule violations for invigilators to review.
+- **User Authentication**: Face matching and email/password authentication required only during student registration and login.
+- **Intuitive User Interface**: A well-designed homepage with a modern layout, login and register buttons, and important notices.
+- **No Offline Mode Support**: The system explicitly notifies users that offline mode is not supported to prevent exam manipulation.
 
-The system analyzes the candidate's webcam feed and detects activities such as:
+## Tech Stack
+- **Backend**: Django 5.1.5 (Python-based web framework)
+- **Database**: PostgressSQL(for efficient data storage and retrieval)
+- **Frontend**: HTML, CSS, JavaScript (with UI/UX inspired by provided images)
+- **AI Models**: OpenCV, MediaPipe (for face and object detection), custom ML models
+- **Authentication**: Django authentication system with face-matching capabilities
+- **Deployment**: Hosted on a cloud platform with scalability in mind
 
-* 👤 Face detection and monitoring
-* 📱 Suspicious object detection
-* 👀 Multiple-person detection
-* 🚨 Unusual or suspicious activities
-* 🔔 Real-time alerts and notifications
 
-This reduces the need for continuous human supervision and provides a more secure online examination environment.
+### 📽️ Demo Video
 
-## ✨ Features
+Watch the demo here: [https://youtu.be/O8kfFmwkfOU](https://youtu.be/O8kfFmwkfOU)
 
-* **Face Detection** – Detects and monitors the candidate's face during the examination.
-* **Multiple Face Detection** – Identifies the presence of additional people.
-* **Object Detection** – Detects potentially prohibited objects such as mobile phones.
-* **Real-Time Monitoring** – Processes webcam video continuously.
-* **Suspicious Activity Detection** – Identifies predefined suspicious behaviors.
-* **Real-Time Alerts** – Sends alerts when suspicious activity is detected.
-* **WebSocket Communication** – Enables real-time communication between the client and server.
-* **Automated Proctoring** – Minimizes the need for manual supervision.
 
-## 🏗️ System Architecture
+## Installation & Setup
+### Prerequisites
+- Python 3.x
+- Postgress SQL installed and running
+- 
 
-```text
-                    ┌─────────────────────┐
-                    │     Candidate       │
-                    │      Webcam         │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │    React Frontend   │
-                    │  Exam + Live Video  │
-                    └──────────┬──────────┘
-                               │
-                         WebSocket
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │  Node.js / Express  │
-                    │       Backend       │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │   AI Proctoring     │
-                    │       Engine        │
-                    │ Python + OpenCV     │
-                    │       + YOLO        │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │ Suspicious Activity │
-                    │ Detection & Alerts  │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │      MongoDB        │
-                    │   Logs & Records    │
-                    └─────────────────────┘
-```
+### Steps
+1. **Clone the Repository**
+   ```bash
+   https://github.com/HelpRam/An-Inbrowser-Proctoring-System.git
+   cd .\futurproctor\
+   ```
 
-## 🛠️ Tech Stack
+2. **Create and Activate Virtual Environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # On Windows: venv\Scripts\activate
+   ```
 
-### Frontend
+3. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-* HTML
-* CSS
-* JavaScript
-* React.js
+4. **Set Up Database**
+   - Ensure Postgress is running.
+   - Configure database settings in `settings.py`.
 
-### Backend
+5. **Run Migrations**
+   ```bash
+   python manage.py migrate
+   ```
 
-* Node.js
-* Express.js
-* WebSockets
+6. **Start the Development Server**
+   ```bash
+   python manage.py runserver
+   ```
+   The application will be accessible at `http://127.0.0.1:8000/`.
 
-### AI / Computer Vision
+## Usage
+- **Register/Login**: Users must authenticate via face matching and email/password verification.
+- **Start Exam**: Once authenticated, users can begin their exam session.
+- **Real-time Monitoring**: AI models will track face, gaze, and object detection throughout the session.
+- **Violation Alerts**: The system automatically flags suspicious activities for review.
+- **View Reports**: Instructors or administrators can access detailed reports post-exam.
 
-* Python
-* OpenCV
-* YOLO
-* TensorFlow / PyTorch
+## Future Enhancements
+- **Live Human Proctoring Integration**
+- **Voice Command Detection for Additional Security**
+- **Mobile App for Enhanced Accessibility**
+- **Multi-Exam Support with Custom Rules Configuration**
 
-### Database
+## Contributors
+- **Ramdular Yadav** (Lead Developer)
 
-* MongoDB
 
-## 📂 Project Structure
+## License
+This project is licensed under the MIT License.
 
-```text
-AI-Proctoring-System/
-│
-├── frontend/
-│   ├── components/
-│   ├── pages/
-│   ├── assets/
-│   └── App.js
-│
-├── backend/
-│   ├── routes/
-│   ├── controllers/
-│   ├── server.js
-│   └── websocket/
-│
-├── ai-engine/
-│   ├── face_detection/
-│   ├── object_detection/
-│   ├── proctor.py
-│   └── models/
-│
-├── database/
-│   └── models/
-│
-├── requirements.txt
-├── package.json
-└── README.md
-```
+## Contact
+For any inquiries or contributions, feel free to reach out to:
+- **Email**: rammey115@gmail.com
+- **Phone**: 9819936338
 
-## ⚙️ How It Works
-
-1. The candidate logs into the online examination system.
-2. The system requests access to the candidate's webcam.
-3. The webcam continuously captures video frames.
-4. OpenCV processes the video stream.
-5. The AI models detect faces and objects.
-6. Suspicious activities are identified based on predefined rules.
-7. Alerts are generated when suspicious behavior is detected.
-8. Monitoring information and relevant logs are stored in the database.
-
-## 🚨 Example Suspicious Activities
-
-| Activity                     | Detection     |
-| ---------------------------- | ------------- |
-| No face detected             | ⚠️ Alert      |
-| Multiple faces               | 🚨 High Alert |
-| Mobile phone detected        | 🚨 High Alert |
-| Candidate leaves camera view | ⚠️ Alert      |
-| Unauthorized object detected | ⚠️ Alert      |
-
-## 🔧 Installation
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/your-username/AI-Proctoring-System.git
-cd AI-Proctoring-System
-```
-
-### 2. Install Backend Dependencies
-
-```bash
-cd backend
-npm install
-```
-
-### 3. Install AI Dependencies
-
-```bash
-cd ../ai-engine
-pip install -r requirements.txt
-```
-
-### 4. Configure Environment Variables
-
-Create a `.env` file:
-
-```env
-PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-```
-
-### 5. Start the Backend
-
-```bash
-npm start
-```
-
-### 6. Start the Frontend
-
-```bash
-cd frontend
-npm install
-npm start
-```
-
-## 🎯 Use Cases
-
-* Online examinations
-* College/university assessments
-* Recruitment tests
-* Certification examinations
-* Remote assessments
-* Competitive examinations
-
-## 🔮 Future Enhancements
-
-* Voice activity detection
-* Eye and gaze tracking
-* Head-pose estimation
-* Browser/tab-switch detection
-* Audio monitoring
-* AI-generated examination reports
-* Advanced behavioral analysis
-* Cloud-based deployment
-* Admin dashboard with real-time analytics
-
-## 🔐 Privacy & Security
-
-The system should process candidate data responsibly. Webcam and examination data should only be collected with appropriate consent and should be protected using suitable security and data-retention practices.
-
-## 📊 Benefits
-
-* Reduces manual proctoring effort
-* Enables real-time monitoring
-* Improves examination security
-* Detects suspicious activities automatically
-* Supports scalable online examinations
-
-## 👨‍💻 Author
-
-**Varun Suthar**
-
-B.Tech Computer Science Engineering | 2026
-
----
-
-⭐ If you find this project useful, consider giving the repository a star!
