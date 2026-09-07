@@ -1,3 +1,4 @@
+<img width="1900" height="952" alt="image" src="https://github.com/user-attachments/assets/da9bac01-9de7-4eb2-b738-c94f677944c1" />
 # AI-Based Online Exam Proctoring System
 
 ## Overview
